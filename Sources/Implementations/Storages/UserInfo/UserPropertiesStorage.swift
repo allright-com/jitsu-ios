@@ -54,6 +54,9 @@ class UserPropertiesStorageImpl: UserPropertiesStorage {
 			self.removeUserProperties(value, context: context)
 			UserPropertiesMO.createModel(with: value, in: context)
 			do {
+				if !UIApplication.shared.isProtectedDataAvailable {
+           				 return
+        			}
 				try context.save()
 			} catch {
 				logCritical("\(#function) save failed: \(error)")
@@ -74,6 +77,10 @@ class UserPropertiesStorageImpl: UserPropertiesStorage {
 				logDebug("\(#function) deleting \(p.anonymousUserId)")
 				context.delete(p)
 			}
+			if !UIApplication.shared.isProtectedDataAvailable {
+           			 return
+        		}
+			
 			try context.save()
 		} catch {
 			logCriticalFrom(self, "\(#function) remove failed")
@@ -89,6 +96,11 @@ class UserPropertiesStorageImpl: UserPropertiesStorage {
 			for value in valuesToRemove {
 				context.delete(value)
 			}
+			
+			if !UIApplication.shared.isProtectedDataAvailable {
+           			 return
+			}
+			
 			try context.save()
 		} catch {
 			logCriticalFrom(self, "\(#function) clear failed")
